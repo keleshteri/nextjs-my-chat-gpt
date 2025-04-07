@@ -1,0 +1,140 @@
+---
+description: 
+globs: *.ts,*.tsx,*.css
+alwaysApply: false
+---
+---
+description: Tailwind UI Component Structure
+globs: **/*.tsx,**/*.ts,**/*.css
+alwaysApply: false
+---
+# Tailwind UI Component Structure
+
+Standards for structuring Tailwind UI components in React/Next.js applications.
+
+<rule>
+name: tailwind_component_structure
+description: Best practices for structuring Tailwind UI components
+filters:
+  # Match any .tsx, .ts, or .css files
+  - type: file_extension
+    pattern: "\\.(tsx|ts|css)$"
+  # Match files that contain Tailwind classes
+  - type: content
+    pattern: "className=[\"'].*?[\"']"
+  # Match component files
+  - type: content
+    pattern: "(export\\s+(default\\s+)?(function|const)\\s+\\w+)"
+
+actions:
+  - type: suggest
+    message: |
+      When creating Tailwind UI components:
+
+      1. Component Structure:
+         ```tsx
+         // Good structure
+         import React from 'react';
+         import { cn } from '@/lib/utils';
+         
+         interface ComponentProps {
+           className?: string;
+           children?: React.ReactNode;
+           // Other props...
+         }
+         
+         export function Component({ className, children, ...props }: ComponentProps) {
+           return (
+             <div className={cn(
+               // Base styles
+               "base-styles-here",
+               // Variant styles
+               "variant-styles-here",
+               // State styles
+               "state-styles-here",
+               // Custom classes passed from parent
+               className
+             )} {...props}>
+               {children}
+             </div>
+           );
+         }
+         ```
+
+      2. Class Organization:
+         - Group classes by purpose (layout, spacing, typography, etc.)
+         - Use the cn() utility for conditional classes
+         - Extract common patterns into reusable classes
+         - Use Tailwind's @apply directive sparingly and only for truly reusable patterns
+
+      3. Responsive Design:
+         - Mobile-first approach: Start with base styles, then add responsive modifiers
+         - Use consistent breakpoints: sm, md, lg, xl, 2xl
+         - Group responsive classes together for better readability
+
+      4. Component Composition:
+         - Break complex UIs into smaller, reusable components
+         - Use composition over inheritance
+         - Pass className prop to allow customization from parent components
+
+      5. Performance Considerations:
+         - Avoid excessive use of @apply in CSS files
+         - Use JIT (Just-In-Time) mode for better performance
+         - Consider using CSS Modules for component-specific styles
+
+examples:
+  - input: |
+      // Bad: Inline styles, no structure
+      export default function Button() {
+        return (
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Click me
+          </button>
+        );
+      }
+
+      // Good: Structured component with proper organization
+      import { cn } from '@/lib/utils';
+      
+      interface ButtonProps {
+        variant?: 'primary' | 'secondary';
+        size?: 'sm' | 'md' | 'lg';
+        className?: string;
+        children: React.ReactNode;
+      }
+      
+      export function Button({ 
+        variant = 'primary', 
+        size = 'md', 
+        className, 
+        children 
+      }: ButtonProps) {
+        return (
+          <button
+            className={cn(
+              // Base styles
+              "font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2",
+              
+              // Variant styles
+              variant === 'primary' && "bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500",
+              variant === 'secondary' && "bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-500",
+              
+              // Size styles
+              size === 'sm' && "px-3 py-1.5 text-sm",
+              size === 'md' && "px-4 py-2 text-base",
+              size === 'lg' && "px-6 py-3 text-lg",
+              
+              // Custom classes
+              className
+            )}
+          >
+            {children}
+          </button>
+        );
+      }
+    output: "Well-structured Tailwind component with proper organization"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

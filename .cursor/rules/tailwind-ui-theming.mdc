@@ -1,0 +1,98 @@
+---
+description: 
+globs: *.tsx,*.ts,*.css
+alwaysApply: false
+---
+---
+description: Tailwind UI Theming and Customization
+globs: **/*.tsx,**/*.ts,**/*.css
+alwaysApply: false
+---
+# Tailwind UI Theming and Customization
+
+Standards for theming and customizing Tailwind UI components.
+
+<rule>
+name: tailwind_theming
+description: Best practices for theming and customizing Tailwind UI components
+filters:
+  # Match any .tsx, .ts, or .css files
+  - type: file_extension
+    pattern: "\\.(tsx|ts|css)$"
+  # Match files that contain Tailwind classes
+  - type: content
+    pattern: "className=[\"'].*?[\"']"
+  # Match component files
+  - type: content
+    pattern: "(export\\s+(default\\s+)?(function|const)\\s+\\w+)"
+
+actions:
+  - type: suggest
+    message: |
+      When theming and customizing Tailwind UI components:
+
+      1. Theme Configuration:
+         - Extend the Tailwind theme in tailwind.config.js
+         - Define custom colors, fonts, spacing, and other design tokens
+         - Use CSS variables for dynamic theming
+         - Create a consistent design system
+
+      2. Color System:
+         - Define a primary, secondary, and accent color palette
+         - Include semantic colors (success, warning, error, info)
+         - Ensure each color has appropriate shades (50-900)
+         - Consider dark mode alternatives for all colors
+
+      3. Typography System:
+         - Define a consistent typography scale
+         - Create reusable text styles with appropriate line heights
+         - Consider font pairing and readability
+         - Use relative units (rem) for font sizes
+
+      4. Component Variants:
+         - Create consistent variants for common components
+         - Use a variant-based approach for component styling
+         - Implement a theming API for components
+         - Consider using CSS custom properties for dynamic theming
+
+      5. Dark Mode:
+         - Implement dark mode using Tailwind's dark: modifier
+         - Test all components in both light and dark modes
+         - Ensure sufficient contrast in both modes
+         - Consider using CSS variables for theme switching
+
+examples:
+  - input: |
+      // Bad: Hardcoded colors without theming
+      <button className="bg-blue-500 hover:bg-blue-600 text-white">
+        Click me
+      </button>
+
+      // Good: Using theme colors and variants
+      <button className="bg-primary-500 hover:bg-primary-600 text-white">
+        Click me
+      </button>
+
+      // Bad: Inconsistent typography
+      <h1 className="text-3xl font-bold">Title</h1>
+      <p className="text-base">Content</p>
+
+      // Good: Using typography system
+      <h1 className="text-heading-1">Title</h1>
+      <p className="text-body">Content</p>
+
+      // Bad: No dark mode support
+      <div className="bg-white text-black p-4">
+        Content
+      </div>
+
+      // Good: With dark mode support
+      <div className="bg-white dark:bg-gray-800 text-black dark:text-white p-4">
+        Content
+      </div>
+    output: "Themed Tailwind component with consistent design system"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

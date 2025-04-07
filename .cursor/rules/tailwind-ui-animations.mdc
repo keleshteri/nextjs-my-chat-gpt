@@ -1,0 +1,98 @@
+---
+description: 
+globs: *.tsx,*.ts,*.css
+alwaysApply: false
+---
+---
+description: Tailwind UI Animations and Transitions
+globs: **/*.tsx,**/*.ts,**/*.css
+alwaysApply: false
+---
+# Tailwind UI Animations and Transitions
+
+Standards for implementing animations and transitions in Tailwind UI components.
+
+<rule>
+name: tailwind_animations
+description: Best practices for implementing animations and transitions in Tailwind UI components
+filters:
+  # Match any .tsx, .ts, or .css files
+  - type: file_extension
+    pattern: "\\.(tsx|ts|css)$"
+  # Match files that contain Tailwind classes
+  - type: content
+    pattern: "className=[\"'].*?[\"']"
+  # Match component files
+  - type: content
+    pattern: "(export\\s+(default\\s+)?(function|const)\\s+\\w+)"
+
+actions:
+  - type: suggest
+    message: |
+      When implementing animations and transitions in Tailwind UI components:
+
+      1. Performance Considerations:
+         - Use transform and opacity for animations (they're GPU-accelerated)
+         - Avoid animating layout properties (width, height, margin, padding)
+         - Use will-change for elements that will animate frequently
+         - Test animations on lower-end devices
+
+      2. Transition Timing:
+         - Keep transitions short (150-300ms) for UI elements
+         - Use appropriate easing functions (ease-in-out for most cases)
+         - Consider reduced-motion preferences for accessibility
+         - Use consistent timing across similar animations
+
+      3. Animation Types:
+         - Use fade transitions for showing/hiding elements
+         - Implement slide animations for expanding/collapsing content
+         - Add subtle scale animations for interactive elements
+         - Consider micro-interactions for enhanced UX
+
+      4. State Transitions:
+         - Animate between states smoothly (hover, focus, active)
+         - Use transition-all sparingly; prefer specific properties
+         - Implement enter/exit animations for conditional rendering
+         - Consider using CSS custom properties for dynamic animations
+
+      5. Accessibility:
+         - Respect user preferences with @media (prefers-reduced-motion)
+         - Ensure animations don't cause motion sickness
+         - Provide alternatives for users who prefer reduced motion
+         - Test with screen readers and assistive technologies
+
+examples:
+  - input: |
+      // Bad: Animating layout properties
+      <div className="transition-all duration-300">
+        <div className="w-0 hover:w-full">Content</div>
+      </div>
+
+      // Good: Using transform for animations
+      <div className="transition-transform duration-300">
+        <div className="translate-x-0 hover:translate-x-4">Content</div>
+      </div>
+
+      // Bad: No reduced motion support
+      <button className="transition-all duration-300 hover:scale-110">
+        Click me
+      </button>
+
+      // Good: With reduced motion support
+      <button className="transition-transform duration-300 hover:scale-110 motion-safe:hover:scale-110">
+        Click me
+      </button>
+
+      // Bad: Inconsistent animation timing
+      <div className="transition-opacity duration-200">Fade in</div>
+      <div className="transition-transform duration-500">Slide in</div>
+
+      // Good: Consistent animation timing
+      <div className="transition-opacity duration-300">Fade in</div>
+      <div className="transition-transform duration-300">Slide in</div>
+    output: "Tailwind component with performant and accessible animations"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

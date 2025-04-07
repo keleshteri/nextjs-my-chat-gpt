@@ -1,0 +1,98 @@
+---
+description: 
+globs: *.css,*.tsx,*.ts
+alwaysApply: false
+---
+---
+description: Tailwind UI Responsive Design
+globs: **/*.tsx,**/*.ts,**/*.css
+alwaysApply: false
+---
+# Tailwind UI Responsive Design
+
+Standards for creating responsive Tailwind UI components.
+
+<rule>
+name: tailwind_responsive
+description: Best practices for creating responsive Tailwind UI components
+filters:
+  # Match any .tsx, .ts, or .css files
+  - type: file_extension
+    pattern: "\\.(tsx|ts|css)$"
+  # Match files that contain Tailwind classes
+  - type: content
+    pattern: "className=[\"'].*?[\"']"
+  # Match component files
+  - type: content
+    pattern: "(export\\s+(default\\s+)?(function|const)\\s+\\w+)"
+
+actions:
+  - type: suggest
+    message: |
+      When creating responsive Tailwind UI components:
+
+      1. Mobile-First Approach:
+         - Start with base styles for mobile devices
+         - Add responsive modifiers for larger screens
+         - Use min-width breakpoints (sm:, md:, lg:, xl:, 2xl:)
+         - Test on actual devices, not just browser resizing
+
+      2. Breakpoint Strategy:
+         - Use consistent breakpoints across the application
+         - Default Tailwind breakpoints:
+           - sm: 640px
+           - md: 768px
+           - lg: 1024px
+           - xl: 1280px
+           - 2xl: 1536px
+         - Consider custom breakpoints for specific components if needed
+
+      3. Layout Techniques:
+         - Use flex and grid for responsive layouts
+         - Leverage flex-wrap for wrapping content
+         - Use grid-cols-{n} with responsive modifiers
+         - Consider using container queries for component-level responsiveness
+
+      4. Content Adaptation:
+         - Hide/show elements based on screen size (hidden md:block)
+         - Adjust font sizes responsively (text-base md:text-lg)
+         - Modify spacing and padding for different screens
+         - Consider different navigation patterns for mobile vs desktop
+
+      5. Performance Considerations:
+         - Avoid excessive use of responsive utilities
+         - Group related responsive classes together
+         - Use container queries for component-specific responsiveness when appropriate
+         - Test performance on lower-end devices
+
+examples:
+  - input: |
+      // Bad: Desktop-first approach with fixed sizes
+      <div className="w-64 p-4">
+        <h2 className="text-2xl font-bold">Title</h2>
+        <p className="text-base">Content</p>
+      </div>
+
+      // Good: Mobile-first approach with responsive sizing
+      <div className="w-full p-2 sm:p-3 md:p-4 lg:w-64">
+        <h2 className="text-xl sm:text-2xl font-bold">Title</h2>
+        <p className="text-sm sm:text-base">Content</p>
+      </div>
+
+      // Bad: Fixed layout without responsiveness
+      <div className="flex">
+        <div className="w-1/3 p-4">Sidebar</div>
+        <div className="w-2/3 p-4">Content</div>
+      </div>
+
+      // Good: Responsive layout that adapts to screen size
+      <div className="flex flex-col md:flex-row">
+        <div className="w-full md:w-1/3 p-2 md:p-4">Sidebar</div>
+        <div className="w-full md:w-2/3 p-2 md:p-4">Content</div>
+      </div>
+    output: "Responsive Tailwind component with mobile-first approach"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

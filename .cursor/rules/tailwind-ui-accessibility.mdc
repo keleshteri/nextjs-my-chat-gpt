@@ -1,0 +1,100 @@
+---
+description: 
+globs: *.tsx,*.ts,*.css
+alwaysApply: false
+---
+---
+description: Tailwind UI Accessibility
+globs: **/*.tsx,**/*.ts,**/*.css
+alwaysApply: false
+---
+# Tailwind UI Accessibility
+
+Standards for ensuring accessibility in Tailwind UI components.
+
+<rule>
+name: tailwind_accessibility
+description: Best practices for creating accessible Tailwind UI components
+filters:
+  # Match any .tsx, .ts, or .css files
+  - type: file_extension
+    pattern: "\\.(tsx|ts|css)$"
+  # Match files that contain Tailwind classes
+  - type: content
+    pattern: "className=[\"'].*?[\"']"
+  # Match component files
+  - type: content
+    pattern: "(export\\s+(default\\s+)?(function|const)\\s+\\w+)"
+
+actions:
+  - type: suggest
+    message: |
+      When creating accessible Tailwind UI components:
+
+      1. Color Contrast:
+         - Ensure text has sufficient contrast against backgrounds (WCAG AA requires 4.5:1 for normal text)
+         - Use Tailwind's built-in color palette with appropriate contrast ratios
+         - Test with tools like WAVE or axe DevTools
+         - Consider dark mode alternatives for all color combinations
+
+      2. Focus States:
+         - Always include visible focus indicators for interactive elements
+         - Use focus:ring-2 focus:ring-offset-2 for consistent focus styles
+         - Ensure focus styles are not removed with focus:outline-none without alternatives
+         - Test keyboard navigation thoroughly
+
+      3. Semantic HTML:
+         - Use appropriate HTML elements for their intended purpose
+         - Use ARIA attributes when necessary (aria-label, aria-expanded, etc.)
+         - Ensure proper heading hierarchy (h1, h2, h3, etc.)
+         - Use semantic elements like <nav>, <main>, <aside>, etc.
+
+      4. Interactive Elements:
+         - Ensure all interactive elements are keyboard accessible
+         - Use appropriate roles for custom components (role="button", role="tab", etc.)
+         - Include proper aria attributes for state changes
+         - Ensure sufficient touch targets (minimum 44x44px)
+
+      5. Screen Reader Considerations:
+         - Use sr-only class for visually hidden but screen reader accessible content
+         - Provide text alternatives for non-text content
+         - Use aria-live regions for dynamic content updates
+         - Test with screen readers (NVDA, VoiceOver, etc.)
+
+examples:
+  - input: |
+      // Bad: Inaccessible button with poor contrast and no focus state
+      <button className="bg-gray-300 text-gray-600 p-2">
+        Submit
+      </button>
+
+      // Good: Accessible button with proper contrast and focus state
+      <button 
+        className="bg-blue-600 text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        aria-label="Submit form"
+      >
+        Submit
+      </button>
+
+      // Bad: Non-semantic div used as a button
+      <div 
+        className="bg-blue-500 text-white p-2 rounded cursor-pointer"
+        onClick={handleClick}
+      >
+        Click me
+      </div>
+
+      // Good: Semantic button with proper accessibility attributes
+      <button
+        className="bg-blue-500 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        onClick={handleClick}
+        aria-label="Perform action"
+      >
+        Click me
+      </button>
+    output: "Accessible Tailwind component with proper semantic HTML and focus states"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 
