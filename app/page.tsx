@@ -6,6 +6,7 @@ import Bubble from "./components/Bubble";
 import PromptSuggestionRow from "./components/PromptSuggestionsRow";
 import LoadingBubble from "./components/LoadingBubble";
 import { useState, FormEvent } from "react";
+import { FiSend } from 'react-icons/fi';
 
 const Home = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -80,15 +81,17 @@ const Home = () => {
 
   return (
     <main>
-      <Image src={GPTLogo} alt="GPT Logo" width={100} height={100} />
+      <header className="header">
+        <Image src={GPTLogo} alt="AI Assistant" width={48} height={48} priority />
+        <h1>AI Assistant</h1>
+      </header>
+      
       <section className={`${noMessages ? "" : "populated"}`}>
         {noMessages ? (
-          <>
-            <div className="flex flex-col gap-2">
-              <p className="starter-text">Hello, I&apos;m the AI Chatbot. How can I help you today?</p>
-              <PromptSuggestionRow onPromptSuggestionClick={handlePrompt} />
-            </div>
-          </>
+          <div className="flex flex-col items-center justify-center">
+            <p className="starter-text">Hello, I&apos;m the AI Chatbot. How can I help you today?</p>
+            <PromptSuggestionRow onPromptSuggestionClick={handlePrompt} />
+          </div>
         ) : (
           <>
             {messages.map((message, index) => (
@@ -98,10 +101,20 @@ const Home = () => {
               />
             ))}
             {isLoading && <LoadingBubble />}
-            {error && <div className="error-message">Error: {error.message}</div>}
+            {error && (
+              <div className="error-message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                {error.message}
+              </div>
+            )}
           </>
         )}
       </section>
+      
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -110,7 +123,13 @@ const Home = () => {
           onChange={(e) => setInput(e.target.value)}
           value={input}
         />
-        <button type="submit" disabled={isLoading || !input.trim()}>Send</button>
+        <button 
+          type="submit" 
+          disabled={isLoading || !input.trim()}
+        >
+          <FiSend />
+          Send
+        </button>
       </form>
     </main>
   );
