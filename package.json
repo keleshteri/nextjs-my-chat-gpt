@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "seed": "ts-node scripts/loadDb.ts",
+    "init-graph": "ts-node scripts/initGraphDB.ts",
     "lint": "next lint"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
     "ai": "^4.3.0",
     "dotenv": "^16.4.7",
     "langchain": "^0.1.36",
+    "neo4j-driver": "^4.4.10",
     "next": "15.2.4",
     "openai": "^4.91.1",
     "openai-edge": "^1.2.2",

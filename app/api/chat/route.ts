@@ -1,10 +1,10 @@
 import { Configuration, OpenAIApi } from 'openai-edge';
-import { DataAPIClient } from "@datastax/astra-db-ts";
+import { GraphKnowledgeBase } from '@/app/lib/graphDB';
 
 const {
-    ASTRA_DB_NAMESPACE,
-    ASTRA_DB_COLLECTION,
-    ASTRA_DB_API_ENDPOINT,
+    NEO4J_URI,
+    NEO4J_USER,
+    NEO4J_PASSWORD,
     ASTRA_DB_APPLICATION_TOKEN,
     OPENAI_API_KEY,
 } = process.env;
@@ -14,8 +14,13 @@ const config = new Configuration({
 });
 const openai = new OpenAIApi(config);
 
-const dataClient = new DataAPIClient(ASTRA_DB_APPLICATION_TOKEN);
-const db = dataClient.db(ASTRA_DB_API_ENDPOINT, { namespace: ASTRA_DB_NAMESPACE });
+// Initialize GraphRAG knowledge base
+const graphKB = new GraphKnowledgeBase(
+    NEO4J_URI!,
+    NEO4J_USER!,
+    NEO4J_PASSWORD!,
+    ASTRA_DB_APPLICATION_TOKEN!
+);
 
 export async function POST(req: Request) {
     try {
@@ -26,9 +31,7 @@ export async function POST(req: Request) {
         const lastUserMessage = messages[messages.length - 1]?.content;
         console.log("[API] Last user message:", lastUserMessage);
 
-        let docContext = '';
-
-        // Using standard OpenAI for embeddings
+        // Get embeddings for the user message
         console.log("[API] Fetching embeddings for user message");
         const embedResponse = await fetch('https://api.openai.com/v1/embeddings', {
             method: 'POST',
@@ -46,35 +49,39 @@ export async function POST(req: Request) {
         const embedData = await embedResponse.json();
         console.log("[API] Embeddings API response status:", embedResponse.status);
         
+        // Get context using GraphRAG
+        let graphContext = '';
         try {
-            console.log("[API] Querying database for relevant documents");
-            const collection = await db.collection(ASTRA_DB_COLLECTION);
-            const cursor = collection.find(null, {
-                sort: { $vector: embedData.data[0].embedding }, limit: 10
-            });
-
-            const documents = await cursor.toArray();
-            const docsMap = documents?.map((doc) => doc.text)
-            docContext = JSON.stringify(docsMap);
-            console.log("[API] Found context documents:", documents?.length || 0);
-
+            console.log("[API] Retrieving graph-based context");
+            graphContext = await graphKB.getGraphContext(
+                lastUserMessage,
+                embedData.data[0].embedding
+            );
+            console.log("[API] Retrieved graph context");
         } catch (error) {
-            console.error("[API] Error in database query:", error);
-            docContext = "";
+            console.error("[API] Error retrieving graph context:", error);
+            graphContext = "";
         }
 
         const template = {
             role: "system",
             content: `
-            You are a helpful assistant that can answer questions about the following documents:
+            You are a helpful assistant that can answer questions using graph-based knowledge retrieval.
+            The context below includes both directly relevant information and related concepts from the knowledge graph.
+            
             START CONTEXT
-            ${docContext}
+            ${graphContext}
             END CONTEXT
             -----
             Question: ${lastUserMessage}
             -----
+            
+            When answering:
+            1. Use information from both directly relevant nodes and their connected concepts
+            2. If you reference related concepts, explain how they connect to the main topic
+            3. If the context is insufficient, say so and answer based on your general knowledge
             `
-        }
+        };
 
         console.log("[API] Sending request to OpenAI");
         const response = await openai.createChatCompletion({
@@ -89,17 +96,6 @@ export async function POST(req: Request) {
                     responseData.choices[0].message.content.substring(0, 50) + "..." : 
                     "No choices in response");
         
-        // Create a message in the format that the AI package expects
-        const responseMessage = {
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content: responseData.choices[0].message.content,
-        };
-        
-        console.log("[API] Formatted response message:", JSON.stringify(responseMessage));
-        
-        // Implement a custom response that returns the message directly
-        // This bypasses the streaming format which seems to be causing issues
         return new Response(
             JSON.stringify({
                 role: "assistant",
